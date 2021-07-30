@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:the_lemming_archive_blog_app/blocs/blog_bloc.dart';
 import 'package:the_lemming_archive_blog_app/services/blog_service.dart';
+import 'package:webfeed/domain/atom_item.dart';
 import 'package:webfeed/domain/rss_item.dart';
 
 void main() {
@@ -42,8 +43,7 @@ class MyApp extends StatelessWidget {
                     ),
                   );
                 } else {
-                  final List<RssItem> list =
-                      snapshot.data!.rssFeed.items ?? <RssItem>[];
+                  final list = snapshot.data!.atomFeed.items ?? <RssItem>[];
 
                   return ListView.builder(
                     itemCount: list.length,
@@ -96,7 +96,7 @@ class BlogPost extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Text(
-                rssItem.description?.toUpperCase() ?? '',
+                text ?? 'No Content',
               ),
             ),
           )
@@ -104,4 +104,6 @@ class BlogPost extends StatelessWidget {
       ),
     );
   }
+
+  String? get text => rssItem.description;
 }

@@ -16,9 +16,8 @@ class BlogService {
   }
 
   Future<Blog> get blog async {
-    final xmlString = await _xmlData;
-    final feed = await compute<String, RssFeed>(_parseRssFeed, xmlString);
-    return Blog(rssFeed: feed);
+    final feed = await rssFeed;
+    return Blog(feed: feed);
   }
 
   Future<void> refresh() async {
@@ -26,8 +25,17 @@ class BlogService {
     await _getData();
   }
 
-   Future<AtomFeed> getFeed() =>
-      http.read(_targetUrl).then((xmlString) => AtomFeed.parse(xmlString))
+  Future<RssFeed> get rssFeed =>
+      http.get(Uri.parse(lemmingArchiveRssFeed)).then((value) {
+        if (value.statusCode != 200) {
+          throw 'Invalid status code${value.statusCode}';
+        }
+        return compute<String, RssFeed>(_parseRssFeed, value.body);
+      });
+
+  Future<AtomFeed> get atomFeed =>
+      http.read(Uri.parse(lemmingArchiveRssFeed)).then(
+          (xmlString) => compute<String, AtomFeed>(_parseAtomFeed, xmlString));
 
   Future<String> get _xmlData async {
     final response = await http.get(Uri.parse(lemmingArchiveRssFeed));
@@ -45,8 +53,10 @@ RssFeed _parseRssFeed(String xmlString) {
   return RssFeed.parse(xmlString);
 }
 
-class Blog {
-  final RssFeed rssFeed;
+AtomFeed _parseAtomFeed(String xmlString) => AtomFeed.parse(xmlString);
 
-  Blog({RssFeed? rssFeed}) : rssFeed = rssFeed ?? RssFeed();
+class Blog {
+  final RssFeed atomFeed;
+
+  Blog({RssFeed? feed}) : atomFeed = feed ?? RssFeed();
 }
