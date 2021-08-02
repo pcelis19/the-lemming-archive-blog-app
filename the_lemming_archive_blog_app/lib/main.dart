@@ -105,5 +105,5 @@ class BlogPost extends StatelessWidget {
     );
   }
 
-  String? get text => rssItem.description;
+  String? get text => Blog.stripHtmlIfNeeded(rssItem.description ?? '');
 }

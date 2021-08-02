@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:the_lemming_archive_blog_app/blocs/blog_bloc.dart';
 import 'package:webfeed/webfeed.dart';
+
 import 'package:http/http.dart' as http;
 
 class BlogService {
@@ -59,4 +60,7 @@ class Blog {
   final RssFeed atomFeed;
 
   Blog({RssFeed? feed}) : atomFeed = feed ?? RssFeed();
+  static String stripHtmlIfNeeded(String text) {
+    return text.replaceAll(RegExp(r'<[^>]*>|&[^;]+;'), ' ');
+  }
 }
